@@ -1,0 +1,666 @@
+{% extends "base.html" %}
+
+{% block title %}Blog Workspace — DataForge Content Crew{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/workspace.css') }}">
+<style>
+  .sidebar-action-link {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-orange);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .sidebar-action-link:hover {
+    text-decoration: underline;
+    color: var(--color-orange-hover);
+  }
+  .competitor-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .comp-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.2rem;
+    color: var(--color-muted-gray);
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .comp-btn:hover {
+    color: var(--color-deep-teal);
+    background-color: #EAEFF1;
+  }
+  .comp-btn.delete:hover {
+    color: #DC2626;
+    background-color: #FEE2E2;
+  }
+  .competitor-url {
+    font-size: 0.7rem;
+    color: var(--color-muted-gray);
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 140px;
+  }
+  .empty-sidebar-note {
+    font-size: 0.785rem;
+    color: var(--color-text-muted);
+    line-height: 1.45;
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}workspace-body{% endblock %}
+
+{% block content %}
+<!-- Workspace Header -->
+<header class="ws-header">
+  <div class="ws-header-left">
+    <a href="{{ url_for('index') }}" class="ws-brand-link" title="Return to Landing Page">
+      <img src="{{ url_for('static', filename='images/dataforge_logo.jpeg') }}" alt="DataForge logo" class="ws-logo">
+      <span class="ws-brand-title">DataForge Content Crew</span>
+    </a>
+  </div>
+
+  <div class="ws-header-right">
+    <!-- Theme Toggle Button -->
+    <button type="button" class="btn-theme-toggle" id="theme-toggle" aria-label="Toggle dark and light themes" title="Toggle dark/light theme">
+      <svg class="theme-icon-sun" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+      <svg class="theme-icon-moon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
+    </button>
+    <!-- Customize Workspace Popover Trigger -->
+    <button type="button" id="btn-customize-workspace" class="btn btn-secondary btn-sm" title="Customize workspace panel visibility and density">
+      Customize
+    </button>
+    <a href="{{ url_for('blogs') }}" class="btn btn-secondary btn-sm">Blogs</a>
+    <!-- Live Backend Connection Pill -->
+    <div id="ws-health-indicator" class="health-indicator checking" title="Checking Flask backend connection...">
+      <span class="health-dot"></span>
+      <span class="health-text">Connecting...</span>
+    </div>
+    <a href="{{ url_for('onboarding') }}" class="btn btn-secondary btn-sm">Company Profile</a>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary btn-sm">&larr; Back to Home</a>
+  </div>
+</header>
+
+<!-- Mobile Tab Switcher (Visible only on tablets & mobile screens) -->
+<nav class="ws-mobile-nav" aria-label="Workspace sections">
+  <div class="ws-mobile-tabs">
+    <button type="button" class="ws-tab-btn" data-tab="sidebar">Brand &amp; Research</button>
+    <button type="button" class="ws-tab-btn" data-tab="chat">Crew Chat</button>
+    <button type="button" class="ws-tab-btn active" data-tab="editor">Blog Workspace</button>
+  </div>
+</nav>
+
+<!-- Main Workspace Layout -->
+<main class="ws-main">
+  <!-- 1. Left Sidebar: Context & Research -->
+  <aside id="panel-sidebar" class="ws-sidebar" aria-label="Company Context & Competitors">
+    <div class="ws-sidebar-header">
+      <span class="ws-sidebar-title">Brand Context</span>
+      <button type="button" id="btn-collapse-sidebar" class="btn-icon" title="Collapse Brand Context Panel" aria-label="Collapse Brand Context Panel">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+      </button>
+    </div>
+
+    <div class="sidebar-accordion">
+      <!-- Section 1: Company Profile -->
+      <section class="sidebar-card">
+        <div class="sidebar-card-header">
+          <span class="sidebar-card-title">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            Company Profile
+          </span>
+          <button type="button" class="sidebar-action-link" id="link-edit-profile" style="background:none; border:none; padding:0;">Edit</button>
+        </div>
+        <div class="sidebar-card-body" id="sidebar-profile-content">
+          <!-- Dynamically populated via GET /api/company-profile -->
+          <div class="empty-sidebar-note">
+            Loading company profile...
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Competitors -->
+      <section class="sidebar-card">
+        <div class="sidebar-card-header">
+          <span class="sidebar-card-title">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+            Tracked Competitors
+          </span>
+          <button type="button" class="sidebar-action-link" id="btn-open-competitor-modal" style="background:none; border:none; padding:0;">
+            + Add
+          </button>
+        </div>
+        <div class="sidebar-card-body">
+          <ul class="competitor-list" id="sidebar-competitors-list">
+            <!-- Dynamically populated via GET /api/competitors -->
+            <li class="empty-sidebar-note">Loading competitors...</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Section 3: Research -->
+      <section class="sidebar-card">
+        <div class="sidebar-card-header">
+          <span class="sidebar-card-title">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+            Research Anchors
+          </span>
+        </div>
+        <div class="sidebar-card-body">
+          <div id="sidebar-topics">
+            <span class="research-topic-badge"># AI Content Automation</span>
+            <span class="research-topic-badge"># Competitor Intelligence</span>
+            <span class="research-topic-badge"># Multi-Agent Workflows</span>
+            <span class="research-topic-badge"># B2B Thought Leadership</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </aside>
+
+  <!-- Left-to-Center Drag Resize Divider Handle -->
+  <div id="resize-handle-left" class="resize-handle" role="separator" tabindex="0" aria-orientation="vertical" aria-label="Resize Brand Context sidebar" aria-valuenow="270" title="Drag horizontally to resize Brand Context panel (or use Left/Right arrows)">
+    <div class="resize-handle-line"></div>
+  </div>
+
+  <!-- 2. Central Chat Panel -->
+  <section id="panel-chat" class="ws-chat-panel" aria-label="Assistant Chat">
+    <div class="chat-header">
+      <div class="chat-header-title-box">
+        <button type="button" id="btn-expand-sidebar" class="btn-icon" style="display:none;" title="Show Brand Context Sidebar" aria-label="Show Brand Context Sidebar">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+        </button>
+        <h2 class="chat-title">Crew Chat</h2>
+        <span class="chat-session-badge" style="font-size: 0.75rem; color: var(--color-muted-gray);">Conversation saved</span>
+      </div>
+      <div class="chat-header-actions">
+        <button type="button" id="btn-new-chat" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:0.35rem;" title="Start a fresh chat conversation" aria-label="Start new chat">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
+          <span>New Chat</span>
+        </button>
+        <button type="button" id="btn-chat-history" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:0.35rem;" title="View past chat conversations" aria-label="View chat history">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>History</span>
+        </button>
+        <button type="button" id="btn-demo-library" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:0.4rem;" title="View drafts saved in Demo Library" aria-label="View Demo Library">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          <span>Demo Library</span>
+        </button>
+        <button type="button" id="btn-toggle-draft-panel" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:0.4rem;" title="Show or hide Blog Draft panel" aria-label="Toggle Blog Draft panel">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          <span id="draft-panel-btn-label">View Blog Draft</span>
+          <span id="header-draft-pill" class="badge" style="display:none; font-size:0.65rem; padding: 2px 6px;">Draft</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Messages Stream -->
+    <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
+      <!-- Assistant Welcome Card -->
+      <div class="welcome-screen-card" id="welcome-screen-card">
+        <div class="welcome-header-box">
+          <div class="welcome-icon" aria-hidden="true">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
+            </svg>
+          </div>
+          <h2 class="welcome-title">What would you like to write about?</h2>
+        </div>
+        <p class="welcome-desc">
+          Enter a topic, ask a question, or pick an industry angle below. The DataForge Content Crew will research competitor gaps, build a structured outline, and generate a publication-ready draft.
+        </p>
+
+        <!-- Suggested Prompt Chips -->
+        <div class="prompt-chips-container" id="prompt-chips-box">
+          <div class="chips-label">Suggested topics to explore:</div>
+          <div class="prompt-chips">
+            <button type="button" class="prompt-chip" data-prompt="Explain how agentic AI is changing customer support">
+              &ldquo;Explain how agentic AI is changing customer support&rdquo;
+            </button>
+            <button type="button" class="prompt-chip" data-prompt="Enterprise guide to LLM evaluation and observability">
+              &ldquo;Enterprise guide to LLM evaluation and observability&rdquo;
+            </button>
+            <button type="button" class="prompt-chip" data-prompt="Autonomous multi-agent workflows for B2B SaaS">
+              &ldquo;Autonomous multi-agent workflows for B2B SaaS&rdquo;
+            </button>
+            <button type="button" class="prompt-chip" data-prompt="Comparing open-source and proprietary foundation models">
+              &ldquo;Comparing open-source and proprietary foundation models&rdquo;
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Input Area -->
+    <div class="chat-input-area">
+      <form id="chat-form" class="chat-form">
+        <textarea
+          id="chat-input"
+          class="chat-textarea"
+          placeholder="e.g. Explain how agentic AI is changing customer support"
+          rows="1"
+          required
+        ></textarea>
+        <button type="submit" id="chat-send-btn" class="btn btn-primary btn-sm" style="height: 42px; padding: 0 1.25rem;">
+          Send
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Center-to-Right Drag Resize Divider Handle -->
+  <div id="resize-handle-right" class="resize-handle" role="separator" tabindex="0" aria-orientation="vertical" aria-label="Resize Blog Draft panel" aria-valuenow="480" title="Drag horizontally to resize Blog Draft panel (or use Left/Right arrows)">
+    <div class="resize-handle-line"></div>
+  </div>
+
+  <!-- 3. Right Editor / Blog Workspace Side Panel -->
+  <section id="panel-editor" class="ws-editor-panel active-tab-panel" aria-label="Blog Editor and Preview">
+    <!-- Panel Header Bar with Collapse & Expand -->
+    <div class="editor-header-bar">
+      <div class="editor-header-title">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+        <span>Blog Draft Sidebar</span>
+      </div>
+      <div class="editor-header-controls">
+        <button type="button" id="btn-expand-draft" class="btn-icon" title="Toggle wide / standard view" aria-label="Toggle wide or standard view">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+        </button>
+        <button type="button" id="btn-close-draft-panel" class="btn-icon" title="Hide Blog Draft panel" aria-label="Hide Blog Draft panel">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+    </div>
+    <!-- State A: Empty State when no blog has been generated yet -->
+    <div id="empty-draft-view" class="empty-draft-container">
+      <div class="empty-draft-card">
+        <div class="empty-draft-icon" aria-hidden="true">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path>
+          </svg>
+        </div>
+        <h3 class="empty-draft-title">No blog generated yet</h3>
+        <p class="empty-draft-desc">
+          Your synthesized article will appear here once the research crew completes writing. Send an instruction in the chat or create a starter draft to begin editing.
+        </p>
+        <div class="empty-draft-action">
+          <button type="button" id="btn-load-sample" class="btn btn-secondary btn-sm">
+            Create Starter Draft
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- State B: Populated Draft View -->
+    <div id="populated-draft-view" class="draft-wrapper">
+      <!-- Editor Toolbar -->
+      <div class="editor-toolbar">
+        <div class="editor-meta">
+          <div class="meta-item">
+            <span>Status:</span>
+            <span id="draft-status-badge" class="badge" style="background:#E2F3EB; color:#0F6938;">Draft</span>
+          </div>
+          <div class="meta-item">
+            <span>Words:</span>
+            <span id="word-count" class="meta-count">0</span>
+          </div>
+          <div class="meta-item">
+            <span>Read time:</span>
+            <span id="read-time" class="meta-count">1 min read</span>
+          </div>
+        </div>
+
+        <!-- Draft Actions -->
+        <div class="editor-actions">
+          <button type="button" id="btn-toggle-edit" class="btn btn-secondary btn-sm" title="Toggle edit mode">
+            Edit Mode
+          </button>
+          <button type="button" id="btn-save-draft" class="btn btn-secondary btn-sm" title="Save draft changes">
+            Save Draft
+          </button>
+          <button type="button" id="btn-regenerate" class="btn btn-secondary btn-sm" title="Regenerate a fresh draft version based on latest research and brand context">
+            Regenerate Article
+          </button>
+          <button type="button" id="btn-request-revision" class="btn btn-secondary btn-sm" title="Request targeted revision through chat">
+            Request Revision
+          </button>
+          <button type="button" id="btn-approve" class="btn btn-outline btn-sm" title="Approve this draft version">
+            Approve
+          </button>
+          <button type="button" id="btn-publish" class="btn btn-primary btn-sm disabled" aria-disabled="true" title="Publish approved draft to your Content Crew Blogs library">
+            Publish
+          </button>
+        </div>
+      </div>
+
+      <!-- Blog Content Area -->
+      <div class="editor-content-area">
+        <!-- Editable Title -->
+        <input
+          type="text"
+          id="draft-title"
+          class="draft-title-input"
+          value="The Modern DevOps Playbook: Navigating Hybrid Cloud Complexity in 2026"
+          aria-label="Blog post title"
+        >
+
+        <!-- Raw text editor for edit mode (hidden by default) -->
+        <textarea
+          id="raw-editor"
+          class="editor-raw-textarea"
+          aria-label="Raw draft editor"
+        ></textarea>
+
+        <!-- Rendered Article Body (Preview mode) -->
+        <article id="article-body" class="article-body" contenteditable="false">
+          <h2>Introduction: The Multi-Cloud Reality</h2>
+          <p>
+            Over 87% of enterprise engineering organizations now maintain workloads across multiple cloud providers and on-premises infrastructure. While this multi-cloud diversification reduces vendor lock-in, it introduces friction in deployment frequency, compliance governance, and observability.
+          </p>
+
+          <h2>1. Establishing Unified CI/CD Pipelines</h2>
+          <p>
+            Managing distinct deployment configurations for AWS, GCP, and internal Kubernetes clusters quickly results in configuration drift. High-performing engineering teams adopt declarative GitOps principles to maintain parity across environments:
+          </p>
+          <ul>
+            <li><strong>Single Source of Truth:</strong> Keep all infrastructure definitions and application manifests in versioned git repositories.</li>
+            <li><strong>Automated Policy Checks:</strong> Integrate security and compliance guardrails directly into pull request checks before artifacts reach staging.</li>
+            <li><strong>Canary Deployments:</strong> Gradually route traffic to new revisions while observing automated error rate thresholds.</li>
+          </ul>
+
+          <h2>2. Observability Beyond Basic Metrics</h2>
+          <p>
+            Traditional monitoring dashboards often fail during cross-cloud latency spikes because telemetry data is trapped in isolated silos. Unifying distributed traces, structured logs, and metrics into an integrated data fabric provides instant visibility into root causes.
+          </p>
+
+          <h2>Conclusion</h2>
+          <p>
+            Building a resilient hybrid cloud workflow requires disciplined tooling, transparent team contracts, and automated governance.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Edit Company Profile Modal -->
+<div id="profile-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-profile-title">
+  <div class="modal-box modal-box-lg">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-profile-title">Edit Company Profile</h3>
+      <button type="button" class="modal-close-btn" id="modal-profile-close" aria-label="Close">&times;</button>
+    </div>
+    <form id="profile-edit-form" novalidate>
+      <div class="modal-body" style="max-height: 72vh; overflow-y: auto;">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="edit-prof-company-name">Company Name <span class="required">*</span></label>
+            <input type="text" id="edit-prof-company-name" name="company_name" class="form-input" placeholder="e.g., DataForge" required>
+            <span class="field-error" id="err-edit-company-name"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-prof-website">Website URL <span class="required">*</span></label>
+            <input type="url" id="edit-prof-website" name="website" class="form-input" placeholder="https://dataforge.ai" required>
+            <span class="field-error" id="err-edit-website"></span>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="edit-prof-industry">Industry <span class="required">*</span></label>
+            <input type="text" id="edit-prof-industry" name="industry" class="form-input" placeholder="Enterprise AI & Content Marketing" required>
+            <span class="field-error" id="err-edit-industry"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-prof-target-audience">Target Audience <span class="required">*</span></label>
+            <input type="text" id="edit-prof-target-audience" name="target_audience" class="form-input" placeholder="B2B Marketing Leaders, Technical Directors" required>
+            <span class="field-error" id="err-edit-target-audience"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit-prof-description">Company Description <span class="required">*</span></label>
+          <textarea id="edit-prof-description" name="description" class="form-textarea" rows="2" placeholder="Briefly describe what your company does..." required></textarea>
+          <span class="field-error" id="err-edit-description"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit-prof-products">Products &amp; Services <span class="required">*</span></label>
+          <input type="text" id="edit-prof-products" name="products_services" class="form-input" placeholder="DataForge Content Crew, Competitor SERP Intelligence Engine" required>
+          <span class="field-error" id="err-edit-products"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit-prof-usp">Unique Selling Proposition (USP) <span class="required">*</span></label>
+          <textarea id="edit-prof-usp" name="usp" class="form-textarea" rows="2" placeholder="What sets you apart from competitors?" required></textarea>
+          <span class="field-error" id="err-edit-usp"></span>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="edit-prof-tone">Tone of Voice <span class="required">*</span></label>
+            <select id="edit-prof-tone" name="tone" class="form-select" required>
+              <option value="Authoritative, Insightful & Technical">Authoritative, Insightful & Technical</option>
+              <option value="Authoritative & Technical">Authoritative & Technical</option>
+              <option value="Conversational & Practical">Conversational & Practical</option>
+              <option value="Executive & Strategic">Executive & Strategic</option>
+              <option value="Engaging & Educational">Engaging & Educational</option>
+            </select>
+            <span class="field-error" id="err-edit-tone"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-prof-goals">Content Goals <span class="required">*</span></label>
+            <input type="text" id="edit-prof-goals" name="content_goals" class="form-input" placeholder="Drive organic search dominance, thought leadership" required>
+            <span class="field-error" id="err-edit-goals"></span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" id="modal-profile-cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm" id="modal-profile-save">Save Profile</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Competitor Add/Edit Modal -->
+<div id="competitor-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-comp-title">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-comp-title">Add Competitor</h3>
+      <button type="button" class="modal-close-btn" id="modal-comp-close" aria-label="Close">&times;</button>
+    </div>
+    <form id="competitor-form" novalidate>
+      <input type="hidden" id="comp-id" name="id" value="">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="comp-name">
+            Competitor Name <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="comp-name"
+            name="name"
+            class="form-input"
+            placeholder="e.g., CloudPulse Analytics"
+            required
+          >
+          <span class="field-error" id="err-comp-name"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="comp-url">
+            Website URL <span class="required">*</span>
+          </label>
+          <input
+            type="url"
+            id="comp-url"
+            name="website_url"
+            class="form-input"
+            placeholder="https://cloudpulse.io"
+            required
+          >
+          <span class="field-error" id="err-comp-url"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="comp-notes">
+            Notes / Keyword Focus (Optional)
+          </label>
+          <input
+            type="text"
+            id="comp-notes"
+            name="notes"
+            class="form-input"
+            placeholder="e.g., High overlap in multi-cloud cost monitoring"
+          >
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" id="modal-comp-cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm" id="modal-comp-save">Save Competitor</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Demo Library Modal -->
+<div id="demo-library-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-library-title">
+  <div class="modal-box modal-box-lg">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title" id="modal-library-title">Demo Library</h3>
+        <p style="font-size:0.775rem; color:var(--color-muted-gray); margin-top:2px;">
+          Drafts saved locally in your demo library. Not publicly published.
+        </p>
+      </div>
+      <button type="button" class="modal-close-btn" id="modal-library-close" aria-label="Close Demo Library">&times;</button>
+    </div>
+    <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
+      <div id="demo-library-list" class="demo-library-list">
+        <div class="empty-sidebar-note">Loading saved drafts...</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary btn-sm" id="modal-library-dismiss">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Customize Workspace Modal -->
+<div id="customize-workspace-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-customize-title">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-customize-title">Customize Workspace</h3>
+      <button type="button" class="modal-close-btn" id="modal-customize-close" aria-label="Close Customize Workspace">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:1.25rem;">
+        Configure panel visibility and display density. Preferences are saved automatically to your browser.
+      </p>
+
+      <fieldset style="border:none; margin-bottom:1.25rem;">
+        <legend style="font-size:0.875rem; font-weight:700; color:var(--color-deep-teal); margin-bottom:0.65rem;">Panel Visibility</legend>
+        <div style="display:flex; flex-direction:column; gap:0.65rem;">
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.875rem; cursor:pointer;">
+            <input type="checkbox" id="pref-show-sidebar" checked>
+            <span>Show Brand Context Sidebar (Left)</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.875rem; cursor:pointer;">
+            <input type="checkbox" id="pref-show-draft" checked>
+            <span>Show Blog Draft Sidebar (Right)</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset style="border:none; margin-bottom:1.25rem;">
+        <legend style="font-size:0.875rem; font-weight:700; color:var(--color-deep-teal); margin-bottom:0.65rem;">Interface Density</legend>
+        <div style="display:flex; gap:1.25rem;">
+          <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.875rem; cursor:pointer;">
+            <input type="radio" name="pref-density" id="pref-density-comfortable" value="comfortable" checked>
+            <span>Comfortable</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.875rem; cursor:pointer;">
+            <input type="radio" name="pref-density" id="pref-density-compact" value="compact">
+            <span>Compact</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div style="border-top:1px solid var(--color-border-subtle); padding-top:1rem;">
+        <button type="button" class="btn btn-outline btn-sm" id="btn-reset-layout">
+          Reset Default Layout &amp; Widths
+        </button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary btn-sm" id="modal-customize-save">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Regenerate Confirmation Modal -->
+<div id="regenerate-confirm-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-regen-title">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-regen-title">Regenerate Blog Article</h3>
+      <button type="button" class="modal-close-btn" id="modal-regen-close" aria-label="Cancel Regeneration">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.9rem; color:var(--color-text-main); margin-bottom:0.75rem;">
+        <strong>How Regeneration Works:</strong>
+      </p>
+      <ul style="font-size:0.85rem; color:var(--color-text-muted); line-height:1.55; margin-left:1.25rem; margin-bottom:1rem;">
+        <li>Produces a fresh version based on approved research, brand context, and verified sources.</li>
+        <li>Increments the draft version number (e.g. Version 1 &rarr; Version 2).</li>
+        <li>Preserves previous versions in database history so earlier work is never lost.</li>
+        <li>Clears previous editorial approvals (requires re-approval before publishing).</li>
+      </ul>
+      <p style="font-size:0.8rem; color:var(--color-orange); background:var(--color-orange-subtle); padding:0.6rem 0.8rem; border-radius:var(--radius-sm);">
+        <em>Note: If you only need targeted tweaks, use "Request Revision" instead.</em>
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary btn-sm" id="modal-regen-cancel">Keep Current Version</button>
+      <button type="button" class="btn btn-primary btn-sm" id="modal-regen-confirm">Regenerate New Version</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Sessions History Modal -->
+<div id="chat-history-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-history-title">
+  <div class="modal-box modal-box-md">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-history-title">Chat Conversation History</h3>
+      <button type="button" class="modal-close-btn" id="modal-history-close" aria-label="Close conversation history">&times;</button>
+    </div>
+    <div class="modal-body" style="max-height: 55vh; overflow-y: auto;">
+      <div id="chat-history-list" class="history-list">
+        <div class="empty-sidebar-note">Loading conversation history...</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary btn-sm" id="btn-modal-new-chat">+ Start New Chat</button>
+      <button type="button" class="btn btn-secondary btn-sm" id="modal-history-dismiss">Close</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/workspace.js') }}"></script>
+{% endblock %}

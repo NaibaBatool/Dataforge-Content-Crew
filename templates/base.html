@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}DataForge Content Crew{% endblock %}</title>
+  <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='images/dataforge_logo.jpeg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  {% block content %}{% endblock %}
+
+  <!-- Global Frontend API & Utilities -->
+  <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

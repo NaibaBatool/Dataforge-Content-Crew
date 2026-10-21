@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}DataForge Content Crew — Research Smarter. Write With Purpose.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+{% endblock %}
+
+{% block body_class %}landing-body{% endblock %}
+
+{% block content %}
+<!-- Main Navigation Header -->
+<header class="landing-header">
+  <div class="header-container">
+    <a href="{{ url_for('index') }}" class="brand-wrap">
+      <img src="{{ url_for('static', filename='images/dataforge_logo.jpeg') }}" alt="DataForge logo" class="brand-logo">
+      <div class="brand-text">
+        <span class="brand-title">DataForge <span style="font-weight: 400; color: var(--color-muted-gray);">|</span> Content Crew</span>
+        <span class="brand-tag">Intelligent Content Pipeline</span>
+      </div>
+    </a>
+
+    <nav class="nav-menu" aria-label="Main Navigation">
+      <ul class="nav-links">
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+        <li><a href="{{ url_for('blogs') }}" class="nav-link">Blogs</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- Theme Toggle Button -->
+        <button type="button" class="btn-theme-toggle" id="theme-toggle" aria-label="Toggle dark and light themes" title="Toggle dark/light theme">
+          <svg class="theme-icon-sun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+          <svg class="theme-icon-moon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
+        </button>
+
+        <!-- Live Flask Connectivity Indicator -->
+        <div id="landing-health-indicator" class="health-indicator checking" title="Checking Flask backend connection...">
+          <span class="health-dot"></span>
+          <span class="health-text">Connecting...</span>
+        </div>
+        <a href="{{ url_for('workspace') }}" class="btn btn-primary btn-sm">Open Workspace</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-container">
+      <div class="hero-pill">
+        <span class="badge badge-phase">Phase 1</span>
+        <span>Frontend Foundation & Workspace Architecture</span>
+      </div>
+
+      <h1 class="hero-heading">
+        Research smarter.<br>
+        <span class="hero-highlight">Write with purpose.</span>
+      </h1>
+
+      <p class="hero-description">
+        DataForge Content Crew combines automated competitor research, target SEO keyword analysis,
+        and AI-assisted draft creation into a unified editorial workflow built for modern content teams.
+      </p>
+
+      <div class="hero-actions">
+        <a href="{{ url_for('workspace') }}" class="btn btn-primary" style="padding: 0.75rem 1.75rem; font-size: 1rem;">
+          Open Workspace &rarr;
+        </a>
+        <a href="#features" class="btn btn-secondary" style="padding: 0.75rem 1.5rem; font-size: 1rem;">
+          Explore Features
+        </a>
+      </div>
+
+      <div class="hero-preview-badge">
+        <span>No setup required &bull; Live workspace preview ready</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="section">
+    <div class="section-container">
+      <div class="section-header">
+        <div class="section-subtitle">Core Capabilities</div>
+        <h2 class="section-title">Engineered for Editorial Excellence</h2>
+        <p class="section-lead">
+          Eliminate disjointed tools. Content Crew aligns strategic research directly with your draft editor.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon-box" aria-hidden="true">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Competitor Research</h3>
+          <p class="feature-desc">
+            Monitor industry peers, uncover content gaps, and analyze trending subject matter to inform high-value topics.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon-box" aria-hidden="true">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">SEO & Intent Analysis</h3>
+          <p class="feature-desc">
+            Identify primary and semantic keywords, evaluate search intent, and structure outlines designed to rank.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon-box" aria-hidden="true">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">AI-Assisted Writing</h3>
+          <p class="feature-desc">
+            Generate long-form articles grounded in verifiable evidence and consistent with your defined brand voice.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card">
+          <div class="feature-icon-box" aria-hidden="true">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Review & Refine</h3>
+          <p class="feature-desc">
+            Iteratively request targeted revisions, evaluate tone, check word counts, and approve final copy before publication.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works / Workflow Section -->
+  <section id="how-it-works" class="section workflow-section">
+    <div class="section-container">
+      <div class="section-header">
+        <div class="section-subtitle">Structured Pipeline</div>
+        <h2 class="section-title">How Content Crew Works</h2>
+        <p class="section-lead">
+          A disciplined 5-stage workflow that takes content from raw research to verified publication.
+        </p>
+      </div>
+
+      <div class="workflow-steps-wrap">
+        <div class="workflow-connector"></div>
+
+        <!-- Step 1 -->
+        <div class="workflow-step active">
+          <div class="step-number">1</div>
+          <h4 class="step-label">Research</h4>
+          <p class="step-description">Gather market signals, source links, and competitor themes.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="workflow-step">
+          <div class="step-number">2</div>
+          <h4 class="step-label">Analyze</h4>
+          <p class="step-description">Map keyword opportunities and reader search intent.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="workflow-step">
+          <div class="step-number">3</div>
+          <h4 class="step-label">Write</h4>
+          <p class="step-description">Synthesize research into structured, authoritative drafts.</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="workflow-step">
+          <div class="step-number">4</div>
+          <h4 class="step-label">Review</h4>
+          <p class="step-description">Inspect sources, refine sections, and approve copy.</p>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="workflow-step">
+          <div class="step-number">5</div>
+          <h4 class="step-label">Publish</h4>
+          <p class="step-description">Export clean markdown or push to target content channels.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bottom CTA Section -->
+  <section class="cta-section">
+    <div class="cta-container">
+      <h2 class="cta-title">Ready to explore the workspace?</h2>
+      <p class="cta-desc">
+        Experience the visual foundation and editorial workflow crafted for DataForge Content Crew.
+      </p>
+      <a href="{{ url_for('workspace') }}" class="btn btn-primary" style="padding: 0.85rem 2rem; font-size: 1.05rem;">
+        Open Workspace
+      </a>
+    </div>
+  </section>
+</main>
+
+<!-- Footer -->
+<footer class="landing-footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <img src="{{ url_for('static', filename='images/dataforge_logo.jpeg') }}" alt="DataForge logo" class="footer-logo">
+      <span>DataForge Content Crew &bull; Phase 1 Foundation</span>
+    </div>
+    <div class="footer-note">
+      Modular SaaS Architecture &bull; Built with Flask &amp; Modern Vanilla JavaScript
+    </div>
+  </div>
+</footer>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+{% endblock %}

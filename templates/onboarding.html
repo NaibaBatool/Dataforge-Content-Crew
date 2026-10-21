@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}Company Onboarding — DataForge Content Crew{% endblock %}
+
+{% block extra_css %}
+<style>
+  .onboarding-page {
+    background-color: var(--color-soft-neutral);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .onboarding-nav {
+    background-color: var(--color-white);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.85rem 1.5rem;
+  }
+
+  .onboarding-nav-container {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .onboarding-container {
+    max-width: 780px;
+    margin: 2.5rem auto 4rem;
+    padding: 0 1.25rem;
+    width: 100%;
+  }
+
+  .onboarding-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 2.5rem;
+  }
+
+  .onboarding-header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--color-border-subtle);
+    padding-bottom: 1.5rem;
+  }
+
+  .onboarding-title {
+    font-size: 1.75rem;
+    color: var(--color-deep-teal);
+    margin-bottom: 0.5rem;
+  }
+
+  .onboarding-lead {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    line-height: 1.55;
+  }
+
+  .company-distinction-banner {
+    background-color: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1.15rem;
+    margin-bottom: 2rem;
+    font-size: 0.85rem;
+    color: #166534;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+  }
+
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 650px) {
+    .onboarding-card {
+      padding: 1.5rem;
+    }
+    .form-grid-2 {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}onboarding-page{% endblock %}
+
+{% block content %}
+<header class="onboarding-nav">
+  <div class="onboarding-nav-container">
+    <a href="{{ url_for('workspace') }}" class="brand-wrap">
+      <img src="{{ url_for('static', filename='images/dataforge_logo.jpeg') }}" alt="DataForge logo" class="brand-logo" style="height: 32px;">
+      <span class="brand-title" style="font-size: 1.05rem;">DataForge <span style="font-weight: 400; color: var(--color-muted-gray);">|</span> Content Crew</span>
+    </a>
+    <div style="display: flex; align-items: center; gap: 0.85rem;">
+      <a href="{{ url_for('blogs') }}" class="nav-link" style="font-size:0.875rem; font-weight:500;">Blogs</a>
+      <button type="button" class="btn-theme-toggle" id="theme-toggle" aria-label="Toggle dark and light themes" title="Toggle dark/light theme">
+        <svg class="theme-icon-sun" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+        <svg class="theme-icon-moon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
+      </button>
+      <div id="onboarding-health-indicator" class="health-indicator checking">
+        <span class="health-dot"></span>
+        <span class="health-text">Connecting...</span>
+      </div>
+      <a href="{{ url_for('workspace') }}" class="btn btn-secondary btn-sm">&larr; Back to Workspace</a>
+    </div>
+  </div>
+</header>
+
+<main class="onboarding-container">
+  <div class="onboarding-card">
+    <div class="onboarding-header">
+      <h1 class="onboarding-title">Company Profile &amp; Editorial Context</h1>
+      <p class="onboarding-lead">
+        Configure your organization’s identity, industry positioning, and editorial preferences.
+      </p>
+    </div>
+
+    <!-- Clear distinction notice -->
+    <div class="company-distinction-banner" role="note">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink: 0; margin-top: 1px;">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      <div>
+        <strong>Your Business Profile:</strong> This profile defines <em>your</em> company and voice for article research and writing. It is separate from DataForge (the platform provider).
+      </div>
+    </div>
+
+    <!-- Onboarding Form -->
+    <form id="onboarding-form" novalidate>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label" for="company_name">
+            Company Name <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="company_name"
+            name="company_name"
+            class="form-input"
+            placeholder="e.g., NovaCloud Systems"
+            required
+          >
+          <span class="field-error" id="err-company_name"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="website">
+            Company Website <span class="required">*</span>
+          </label>
+          <input
+            type="url"
+            id="website"
+            name="website"
+            class="form-input"
+            placeholder="https://novacloud.io"
+            required
+          >
+          <span class="field-error" id="err-website"></span>
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label" for="industry">
+            Industry / Domain <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="industry"
+            name="industry"
+            class="form-input"
+            placeholder="e.g., B2B SaaS, DevOps &amp; Cloud"
+            required
+          >
+          <span class="field-error" id="err-industry"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="tone">
+            Preferred Writing Tone <span class="required">*</span>
+          </label>
+          <select id="tone" name="tone" class="form-select" required>
+            <option value="">Select brand voice...</option>
+            <option value="Authoritative & Technical">Authoritative &amp; Technical</option>
+            <option value="Conversational & Engaging">Conversational &amp; Engaging</option>
+            <option value="Thought Leadership & Strategic">Thought Leadership &amp; Strategic</option>
+            <option value="Educational & How-To">Educational &amp; How-To</option>
+            <option value="Analytical & Data-Driven">Analytical &amp; Data-Driven</option>
+          </select>
+          <span class="field-error" id="err-tone"></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="description">
+          Company Description <span class="required">*</span>
+        </label>
+        <textarea
+          id="description"
+          name="description"
+          class="form-textarea"
+          rows="3"
+          placeholder="Brief overview of what your company does and who it serves..."
+          required
+        ></textarea>
+        <span class="field-error" id="err-description"></span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="products_services">
+          Products &amp; Core Services <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="products_services"
+          name="products_services"
+          class="form-input"
+          placeholder="e.g., Multi-cloud deployment manager, Kubernetes cost observability engine"
+          required
+        >
+        <span class="field-error" id="err-products_services"></span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="target_audience">
+          Target Audience &amp; Buyer Persona <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="target_audience"
+          name="target_audience"
+          class="form-input"
+          placeholder="e.g., VP of Engineering, DevOps Directors, Platform Architects"
+          required
+        >
+        <span class="field-error" id="err-target_audience"></span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="usp">
+          Unique Selling Proposition (USP) <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="usp"
+          name="usp"
+          class="form-input"
+          placeholder="e.g., Reduces cross-cloud Kubernetes cloud spend by 40% in under 15 minutes"
+          required
+        >
+        <span class="field-error" id="err-usp"></span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="content_goals">
+          Primary Content Goals <span class="required">*</span>
+        </label>
+        <textarea
+          id="content_goals"
+          name="content_goals"
+          class="form-textarea"
+          rows="2"
+          placeholder="e.g., Drive inbound organic search traffic, establish thought leadership in cloud efficiency, generate MQLs"
+          required
+        ></textarea>
+        <span class="field-error" id="err-content_goals"></span>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+        <a href="{{ url_for('workspace') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" id="btn-save-profile" class="btn btn-primary">
+          Save Company Profile
+        </button>
+      </div>
+    </form>
+  </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/onboarding.js') }}"></script>
+{% endblock %}
